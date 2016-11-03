@@ -57,6 +57,11 @@ CHIP ALU {
 	Mux16(a=andf,b=addf,sel=f,out=aaf); // compute out = x + y (if 1) or x & y (if 0)
 
 	Not16(in=aaf,out=noto);
-	Mux16(a=aaf,b=noto,sel=no,out=out); // negate the out output
+	Mux16(a=aaf,b=noto,sel=no,out=out,out[15]=ng,out[0..7]=t1,out[8..15]=t2); // negate the out output
+
+	Or8Way(in=t1,out=w1);
+	Or8Way(in=t2,out=w2);
+	Or(a=w1,b=w2,out=zeror);
+	Not(in=zeror,out=zr);
 	
 }
