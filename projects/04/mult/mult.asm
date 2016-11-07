@@ -8,17 +8,29 @@
 
 
 @sum
-M=0
-(LOOP)
+@R1
+D=M
+@store
+M=D
 @R0
 D=M
-
+@times
+M=D
+	(LOOP)
+@times
+M=M-1
+D=M
 @END
-D;JGT
-
+D;JLT
+@store
+D=M
+@sum
+M=M+D
+@LOOP
+0;JMP
 (END)
 @END
 @sum
-M=M+
-
-
+D=M
+@R2
+M=D
