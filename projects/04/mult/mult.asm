@@ -7,30 +7,19 @@
 // (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
 
 
-@sum
-@R1
-D=M
-@store
-M=D
-@R0
-D=M
-@times
-M=D
+@R2
+M=0
 	(LOOP)
-@times
+@R0
 M=M-1
 D=M
 @END
 D;JLT
-@store
+@R1
 D=M
-@sum
+@R2
 M=M+D
 @LOOP
 0;JMP
 (END)
 @END
-@sum
-D=M
-@R2
-M=D
