@@ -11,21 +11,21 @@
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
 
-@24576
-D=A
-@track
-M=D
+
 (LOOP)
-@24576
+@SCREEN
+D=A
+@spot
+M=D
+@KBD
 D=M
 @BLACK
-D;JGE
+D;JNE
 @WHITE
 D;JEQ
 
 
 (BLACK)
-@SCREEN
 @spot
 D=M
 A=D
@@ -33,16 +33,15 @@ M=-1
 D=D+1
 @spot
 M=D
-@track
-D=D-M
+@24576
+D=A-D
 @LOOP
-D;JGE
+D;JLE
 @BLACK
 0;JMP
 
 
 (WHITE)
-@SCREEN
 @spot
 D=M
 A=D
@@ -50,9 +49,9 @@ M=0
 D=D+1
 @spot
 M=D
-@track
-D=D-M
+@24576
+D=A-D
 @LOOP
-D;JGE
+D;JLE
 @WHITE
 0;JMP
