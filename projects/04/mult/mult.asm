@@ -22,4 +22,5 @@ M=M+D
 @LOOP
 0;JMP
 (END)
-@END
+@LOOP
+0;JMP

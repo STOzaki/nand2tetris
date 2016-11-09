@@ -16,42 +16,36 @@
 @SCREEN
 D=A
 @spot
-M=D
-@KBD
-D=M
-@BLACK
-D;JNE
-@WHITE
-D;JEQ
+M=D-1 // decreases the spot by one to compensate for next's immidiate increaement.
+@NEXT
+0;JMP
 
 
 (BLACK)
-@spot
-D=M
-A=D
+@spot //finds the spot tha
+A=M
 M=-1
-D=D+1
-@spot
-M=D
-@24576
-D=A-D
-@LOOP
-D;JLE
-@BLACK
+@NEXT
 0;JMP
-
 
 (WHITE)
 @spot
-D=M
-A=D
+A=M
 M=0
-D=D+1
+@NEXT
+0;JMP
+
+(NEXT)
 @spot
-M=D
+M=M+1
+D=M
 @24576
 D=A-D
 @LOOP
 D;JLE
-@WHITE
-0;JMP
+@KBD
+D=M
+@BLACK //Determine whether the keyboard is pressed
+D;JNE
+@WHITE //Determine whether it is black
+D;JEQ
