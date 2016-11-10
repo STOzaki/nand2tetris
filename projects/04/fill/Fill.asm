@@ -13,39 +13,34 @@
 
 
 (LOOP)
-@SCREEN
-D=A
-@spot
-M=D-1 // decreases the spot by one to compensate for next's immidiate increaement.
-@NEXT
-0;JMP
-
-
-(BLACK)
-@spot //finds the spot tha
-A=M
-M=-1
-@NEXT
-0;JMP
-
-(WHITE)
-@spot
-A=M
-M=0
-@NEXT
-0;JMP
-
+	@SCREEN //starting from the top left corner of the screen
+	D=A
+	@spot
+	M=D-1 // decreases the spot by one to compensate for NEXT's immidiate increaement.
+	@NEXT
+	0;JMP
 (NEXT)
-@spot
-M=M+1
-D=M
-@24576
-D=A-D
-@LOOP
-D;JLE
-@KBD
-D=M
-@BLACK //Determine whether the keyboard is pressed
-D;JNE
-@WHITE //Determine whether it is black
-D;JEQ
+	@spot
+	MD=M+1 // moves the spot by one and stores it in D as well
+	@24576
+	D=A-D // takes the lower right corner - spot
+	@LOOP
+	D;JLE // if we have reached the end, then start from the top left corner again
+	@KBD
+	D=M // grabs the value of the keyboard
+	@BLACK
+	D;JNE // if the keyboard is pressed, then turn the color black
+	@WHITE
+	D;JEQ // else turn the color black
+(BLACK)
+	@spot // goes to the spot that needs to be colored
+	A=M
+	M=-1 // colors the spot black
+	@NEXT
+	0;JMP // moves back to the next spot
+(WHITE)
+	@spot // goes to the spot that needs to be colored
+	A=M
+	M=0 // colors the spot white
+	@NEXT
+	0;JMP // moves back to the next spot

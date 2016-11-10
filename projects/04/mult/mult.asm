@@ -7,20 +7,20 @@
 // (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
 
 
-@R2
-M=0
-	(LOOP)
-@R0
-M=M-1
-D=M
-@END
-D;JLT
-@R1
-D=M
-@R2
-M=M+D
-@LOOP
-0;JMP
+	@R2
+	M=0 // sets the sum to 0
+(LOOP)
+	@R0
+	M=M-1
+	D=M // uses one to add R1
+	@END
+	D;JLT // if R1 has been added R0 times, then finish, else continue
+	@R1
+	D=M
+	@R2
+	M=M+D // adds the sum with the R1 value
+	@LOOP
+	0;JMP // keeps going until R1 has been added R0 times
 (END)
-@LOOP
-0;JMP
+	@END
+	0;JMP // infinite loop
