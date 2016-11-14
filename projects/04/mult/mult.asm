@@ -11,8 +11,7 @@
 	M=0 // sets the sum to 0
 (LOOP)
 	@R0
-	M=M-1
-	D=M // uses one to add R1
+	MD=M-1 // R0 - 1
 	@END
 	D;JLT // if R1 has been added R0 times, then finish, else continue
 	@R1
