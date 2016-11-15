@@ -39,7 +39,7 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	Mux16(a=outm,b=instruction,sel=instruction[3],out=ini);
+	Mux16(a=outm,b=instruction,sel=instruction[15],out=ini); // Mux between the instruction and ALU output
 	ARegister(in=ini,load=instruction[5],out=outa,out[0..14]=addressM);
 	Mux16(a=outa,b=inM,sel=instruction[12],out=am);
 	DRegister(in=outm,load=instruction[4],out=outd);
