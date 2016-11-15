@@ -39,17 +39,24 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	Mux16(a=outm,b=instruction,sel=instruction[15],out=ini); // Mux between the instruction and ALU output
-	ARegister(in=ini,load=instruction[5],out=outa,out[0..14]=addressM);
-	Mux16(a=outa,b=inM,sel=instruction[12],out=am);
-	DRegister(in=outm,load=instruction[4],out=outd);
+	Not(in=instruction[15],out=outnot);
+	Or(a=outnot,b=instruction[5],out=sela);
+	Mux16(a=outm,b=instruction,sel=outnot,out=ini); // Mux between the instruction and ALU output
+	ARegister(in=ini,load=sela,out=outa,out[0..14]=addressM);
+	
+	And(a=instruction[15],b=instruction[12],out=outand);
+	Mux16(a=outa,b=inM,sel=outand,out=am); // mux between A and M
+	And(a=instruction[15],b=instruction[4],out=outdr);
+	DRegister(in=outm,load=outdr,out=outd); // D register
+
 	ALU(x=outd,y=am,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=outM,out=outm,zr=zero,ng=notg);
-	Not(in=notg,out=gez);
-	Not(in=zero,out=nzr);
-	Or(a=notg,b=zero,out=ngz);
+	And(a=instruction[2],b=notg,out=w1); // look at the diagram of j1 (check to see if j1 is less than the comp)
+	And(a=instruction[1],b=zero,out=w2); // look at the diagram of j2 (check to see if j2 is equal to the comp)
+	Or(a=zero,b=notg,out=ngz);
 	Not(in=ngz,out=g);
-	Mux8Way16(a[0]=false,b[0]=g,c[0]=zero,d[0]=gez,e[0]=notg,f[0]=nzr,g[0]=ngz,h[0]=true,sel=instruction[0..2],out[0]=loader);
-	PC(in=outa,inc=true,reset=reset,load=loader,out[0..14]=pc);
-	Not(in=instruction[15],out=wm);
-	Not(in=wm,out=writeM);
+	And(a=instruction[0],b=g,out=w3); // look at the diagram of j3 (check to see if j3 is greater than the comp)
+	Or8Way(in[0]=w1,in[1]=w2,in[2]=w3,in[3]=false,in[4]=false,in[5]=false,in[6]=false,in[7]=false,out=loader); // if any of the computations are true, then we will jump
+	And(a=loader,b=instruction[15],out=loadout); // if instruction is 1 then you are going to allow them to jump because it is a C instruction.
+	PC(in=outa,inc=true,reset=reset,load=loadout,out[0..14]=pc);
+	And(a=instruction[3],b=instruction[15],out=writeM);
 }
