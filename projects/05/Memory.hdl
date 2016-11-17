@@ -27,10 +27,10 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-	Mux16(a=outp,b=in,sel=load,out=inn);
-	DMux(in=load,sel=address[14],a=t1,b=t2);
+	Mux16(a=outp,b=in,sel=load,out=inn); // whether we use the previous or current input.
+	DMux(in=load,sel=address[14],a=t1,b=t2); // gives the RAM16K, Screen or neither the input
 	RAM16K(in=inn,load=t1,address=address[0..13],out=w1);
 	Screen(in=inn,load=t2,address=address[0..12],out=w2);
 	Keyboard(out=w3);
-	Mux4Way16(a=w1,b=w1,c=w2,d=w3,sel=address[13..14],out=out,out=outp);
+	Mux4Way16(a=w1,b=w1,c=w2,d=w3,sel=address[13..14],out=out,out=outp); // if the other two are not chosen, then Keyboard will be selected using the 13's bit.
 }
