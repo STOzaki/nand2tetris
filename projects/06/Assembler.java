@@ -20,6 +20,9 @@ import java.util.Scanner;
 public class Assembler {
     String instruction;
     Hashtable<String,String> destTable;
+    int countLine = 0;
+    int placeholder = 16;
+    boolean doDebug = false; // this is to help debug, thanks to Nigel Ticknor
     
     public Assembler(String args) throws Exception{
         destTable = loading();
@@ -30,24 +33,51 @@ public class Assembler {
     
     private void parse(String args, PrintStream out) throws Exception{
         String filename = args;
-        //try{
+        labeling(filename);
+//        try{
             Scanner in = new Scanner(new File(filename));
             while(in.hasNextLine()){
                 String line = in.nextLine();
                 String spaceless = line.replaceAll("\\s", "");
-                if(spaceless.startsWith("//") || spaceless.length()==0){
+                if(spaceless.startsWith("//") || spaceless.length()==0 || spaceless.startsWith("(")){
                   
                 } else {
-                    System.out.println(spaceless);
+                    if(doDebug)System.out.println(spaceless);
                     assembly(spaceless);
                     out.println(instruction);
                 }
             
             }
-        //} catch(Exception e) {
-            System.out.println("I am sorry, but we cannot find the file you"
-                    + " are trying to access.");
-        //}
+            
+            
+//        } catch(Exception e) {
+//            System.out.println("I am sorry, but we cannot find the file you"
+//                    + " are trying to access.");
+//        }
+    }
+    
+    private void labeling(String filename) throws Exception{
+        try{
+        Scanner file = new Scanner(new File(filename));
+        while(file.hasNextLine()){
+            String line = file.nextLine();
+            String spaceless = line.replaceAll("\\s", "");
+            if(spaceless.startsWith("//") || spaceless.length()==0){
+                
+            } else if(spaceless.startsWith("(")) {
+                String name = spaceless.substring(spaceless.indexOf("(") + 1, spaceless.indexOf(")"));
+                //System.out.println(name);
+                int num = countLine;  // +1 to look at the next command, but not make the () count as one of the commands, but -1 because it starts from 0.
+                String lineNum = "" + num; // convertion from http://stackoverflow.com/questions/4105331/how-do-i-convert-from-int-to-string
+                destTable.put(name, lineNum);
+                //System.out.println(lineNum);
+            } else {
+                countLine++;
+            }
+        }
+        } catch(Exception e){
+            System.out.println("The labeling search failed!");
+        }
     }
     
     private void assembly(String line){
@@ -66,32 +96,47 @@ public class Assembler {
     private void aInstruction(String aline){
         instruction = "0";
         String line = aline.substring(1, aline.length()); // gets rid of the @.
-        System.out.println(line + " this is the command for A- instruction");
-        System.out.println(destTable.get(line) + " is the location for "
-                + line + ".");
+        if(doDebug)System.out.println(line + " this is the command for A- instruction");
+//        System.out.println(destTable.get(line) + " is the location for "
+//                + line + ".");
         /*System.out.println("Does destTable contain " + line +"?  "
         + destTable.containsKey(line) + ".");   This is used to test
         destTable.*/
-        
+        Boolean number = false;
+        try{ // checks to see if this is a number or a string
+            int numbering = Integer.parseInt(line);
+            number = true;
+        } catch(Exception e) {
+            if(doDebug)System.out.println("That is not a number!!");
+        }
         String addr = null;  // incase the line does not meet the if statement
+        if(doDebug)System.out.println("Is the string in the destTable? " + destTable.containsKey(line));
+        if(doDebug)System.out.println("Is the string a number? " + number);
         if(destTable.containsKey(line)){ // checking the table
             String location = destTable.get(line);
             int num = Integer.parseInt(location);
             addr = Integer.toBinaryString(num);
+        } else if(number) {
+            //int num = Integer.parseInt(line); // converting from string to int
+            
+            // converting from string to binary
+            addr = Integer.toBinaryString(Integer.parseInt(line));
         } else {
-            int num = Integer.parseInt(line);
-            addr = Integer.toBinaryString(num);
+            String place = placeholder + ""; // coverts the memory address to a string
+            destTable.put(line,place); // stores the name and new memory.
+            addr = Integer.toBinaryString(placeholder);
+            placeholder++;
         }
         while(addr.length() != 15){
             addr = "0" + addr;
         }
         instruction = instruction + addr;
-        System.out.println(instruction + " is the binary location of " + line + ".");
+        if(doDebug)System.out.println(instruction + " is the binary location of " + line + ".");
     }
     
     private void cInstruction(String cline){
         instruction = "111";
-        System.out.println(cline + " this should not have //");
+        if(doDebug)System.out.println(cline + " this should not have //");
             
             // Doing computation
             comp(cline);
@@ -103,19 +148,19 @@ public class Assembler {
                 instruction = instruction + "000";
             }
             // When you give a value to a memory, you do not jump
-            System.out.println(cline.contains(";") + " does it contain ;?");
+            if(doDebug)System.out.println(cline.contains(";") + " does it contain ;?");
             if(cline.contains(";")){
                 jump(cline);
             } else {
                 instruction = instruction + "000";
             }
-            System.out.println(instruction + " this is the final instruction!");
+            if(doDebug)System.out.println(instruction + " this is the final instruction!");
         
     }
     
     private void destination(String line){
         String dest = line.substring(0, line.indexOf("="));
-        System.out.println(dest+" This should be the destination.");
+        if(doDebug)System.out.println(dest+" This should be the destination.");
         String d1;
         String d2;
         String d3;
@@ -135,28 +180,28 @@ public class Assembler {
             d3 = "0";
         }
         instruction = instruction + d1 + d2 + d3;
-        System.out.println(instruction + " this has destination");
+        if(doDebug)System.out.println(instruction + " this has destination");
     }
     
     private void comp(String line){
         String compare = line;
             if(line.contains("=")){
                 compare = line.substring(line.indexOf("=") + 1);
-                System.out.println(compare + " should not contain =");
+               if(doDebug) System.out.println(compare + " should not contain =");
             }
             if(line.contains(";")){ /* gets rid of the jump because this is
                 comp not jump. */
                 compare = compare.substring(0, compare.indexOf(";"));
             }
-            System.out.println(compare + " This is the thing that will be computed");
+            if(doDebug)System.out.println(compare + " This is the thing that will be computed");
             if(compare.contains("M")){
                 instruction = instruction + "1";
                 comp1(compare);
-                System.out.println(instruction + "for if it contain M");
+                if(doDebug)System.out.println(instruction + "for if it contain M");
             } else {
                 instruction = instruction + "0";
                 comp2(compare);
-                System.out.println(instruction + "for if it does not contain M");
+                if(doDebug)System.out.println(instruction + "for if it does not contain M");
             }
         
     }
@@ -260,7 +305,7 @@ public class Assembler {
     
     private void jump(String line){
         String jum = line.substring(line.indexOf(";") + 1, line.length());
-        System.out.println(jum + " this should be just the jump");
+        if(doDebug)System.out.println(jum + " this should be just the jump");
         if(jum.equals("JGT")){
             instruction = instruction + "001";
         } else if(jum.equals("JEQ")){
