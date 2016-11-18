@@ -6,8 +6,6 @@
 package assembler;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 import java.io.PrintStream;
 import java.util.Hashtable;
 import java.util.Scanner;
@@ -34,7 +32,7 @@ public class Assembler {
     private void parse(String args, PrintStream out) throws Exception{
         String filename = args;
         labeling(filename);
-//        try{
+        try{
             Scanner in = new Scanner(new File(filename));
             while(in.hasNextLine()){
                 String line = in.nextLine();
@@ -50,10 +48,10 @@ public class Assembler {
             }
             
             
-//        } catch(Exception e) {
-//            System.out.println("I am sorry, but we cannot find the file you"
-//                    + " are trying to access.");
-//        }
+        } catch(Exception e) {
+            System.out.println("I am sorry, but we cannot find the file you"
+                    + " are trying to access.");
+        }
     }
     
     private void labeling(String filename) throws Exception{
@@ -97,11 +95,8 @@ public class Assembler {
         instruction = "0";
         String line = aline.substring(1, aline.length()); // gets rid of the @.
         if(doDebug)System.out.println(line + " this is the command for A- instruction");
-//        System.out.println(destTable.get(line) + " is the location for "
-//                + line + ".");
-        /*System.out.println("Does destTable contain " + line +"?  "
-        + destTable.containsKey(line) + ".");   This is used to test
-        destTable.*/
+        if(doDebug)System.out.println("Does destTable contain " + line +"?  "
+        + destTable.containsKey(line) + ".");   // This is used to test destTable.
         Boolean number = false;
         try{ // checks to see if this is a number or a string
             int numbering = Integer.parseInt(line);
@@ -206,130 +201,139 @@ public class Assembler {
         
     }
     
-    private void comp1(String compare){
-        if(compare.equals("M")){
-            instruction = instruction + "110000";
-            
-        } else if(compare.equals("!M")){
-            instruction = instruction + "110001";
-            
-        } else if(compare.equals("-M")){
-            instruction = instruction + "110011";
-            
-        } else if(compare.equals("M+1")){
-            instruction = instruction + "110111";
-            
-        } else if(compare.equals("M-1")){
-            instruction = instruction + "110010";
-            
-        } else if(compare.equals("D+M")){
-            instruction = instruction + "000010";
-            
-        } else if(compare.equals("D-M")){
-            instruction = instruction + "010011";
-            
-        } else if(compare.equals("M-D")){
-            instruction = instruction + "000111";
-            
-        } else if(compare.equals("D&M")){
-            instruction = instruction + "000000";
-            
-        } else if(compare.equals("D|M")){
-            instruction = instruction + "010101";
-            
-        } else {
-            System.out.println("ERROR, I do not reconize this computation"
-                    + " when a = 1, means that we are dealing with M.");
+    private void comp1(String compare){ // find the command for comp for a=1
+        switch (compare) {
+            case "M":
+                instruction = instruction + "110000";
+                break;
+            case "!M":
+                instruction = instruction + "110001";
+                break;
+            case "-M":
+                instruction = instruction + "110011";
+                break;
+            case "M+1":
+                instruction = instruction + "110111";
+                break;
+            case "M-1":
+                instruction = instruction + "110010";
+                break;
+            case "D+M":
+                instruction = instruction + "000010";
+                break;
+            case "D-M":
+                instruction = instruction + "010011";
+                break;
+            case "M-D":
+                instruction = instruction + "000111";
+                break;
+            case "D&M":
+                instruction = instruction + "000000";
+                break;
+            case "D|M":
+                instruction = instruction + "010101";
+                break;
+            default:
+                System.out.println("ERROR, I do not reconize this computation"
+                        + " when a = 1, means that we are dealing with M.");
+                break;
         }
     }
     
-    private void comp2(String compare){
-        if(compare.equals("0")){
-            instruction = instruction + "101010";
-        } else if(compare.equals("1")){
-            instruction = instruction + "111111";
-            
-        } else if(compare.equals("-1")){
-            instruction = instruction + "111010";
-            
-        } else if(compare.equals("D")){
-            instruction = instruction + "001100";
-            
-        } else if(compare.equals("A")){
-            instruction = instruction + "110000";
-            
-        } else if(compare.equals("!D")){
-            instruction = instruction + "001101";
-            
-        } else if(compare.equals("!A")){
-            instruction = instruction + "110001";
-            
-        } else if(compare.equals("-D")){
-            instruction = instruction + "001111";
-            
-        } else if(compare.equals("-A")){
-            instruction = instruction + "110011";
-            
-        } else if(compare.equals("D+1")){
-            instruction = instruction + "011111";
-            
-        } else if(compare.equals("A+1")){
-            instruction = instruction + "110111";
-            
-        } else if(compare.equals("D-1")){
-            instruction = instruction + "001110";
-            
-        } else if(compare.equals("A-1")){
-            instruction = instruction + "110010";
-            
-        } else if(compare.equals("D+A")){
-            instruction = instruction + "000010";
-            
-        } else if(compare.equals("D-A")){
-            instruction = instruction + "010011";
-            
-        } else if(compare.equals("A-D")){
-            instruction = instruction + "000111";
-            
-        } else if(compare.equals("D&A")){
-            instruction = instruction + "000000";
-            
-        } else if(compare.equals("D|A")){
-            instruction = instruction + "010101";
-            
-        } else {
-            System.out.println("ERROR, I do not reconize this computation"
-                    + " when a = 1, means that we are dealing with M.");
+    private void comp2(String compare){ // finding the commands for a=0
+        switch (compare) {
+            case "0":
+                instruction = instruction + "101010";
+                break;
+            case "1":
+                instruction = instruction + "111111";
+                break;
+            case "-1":
+                instruction = instruction + "111010";
+                break;
+            case "D":
+                instruction = instruction + "001100";
+                break;
+            case "A":
+                instruction = instruction + "110000";
+                break;
+            case "!D":
+                instruction = instruction + "001101";
+                break;
+            case "!A":
+                instruction = instruction + "110001";
+                break;
+            case "-D":
+                instruction = instruction + "001111";
+                break;
+            case "-A":
+                instruction = instruction + "110011";
+                break;
+            case "D+1":
+                instruction = instruction + "011111";
+                break;
+            case "A+1":
+                instruction = instruction + "110111";
+                break;
+            case "D-1":
+                instruction = instruction + "001110";
+                break;
+            case "A-1":
+                instruction = instruction + "110010";
+                break;
+            case "D+A":
+                instruction = instruction + "000010";
+                break;
+            case "D-A":
+                instruction = instruction + "010011";
+                break;
+            case "A-D":
+                instruction = instruction + "000111";
+                break;
+            case "D&A":
+                instruction = instruction + "000000";
+                break;
+            case "D|A":
+                instruction = instruction + "010101";
+                break;
+            default:
+                System.out.println("ERROR, I do not reconize this computation"
+                        + " when a = 1, means that we are dealing with M.");
+                break;
         }
     }
     
-    private void jump(String line){
+    private void jump(String line){ // gives the instruction the jump command
         String jum = line.substring(line.indexOf(";") + 1, line.length());
         if(doDebug)System.out.println(jum + " this should be just the jump");
-        if(jum.equals("JGT")){
-            instruction = instruction + "001";
-        } else if(jum.equals("JEQ")){
-            instruction = instruction + "010";
-            
-        } else if(jum.equals("JGE")){
-            instruction = instruction + "011";
-            
-        } else if(jum.equals("JLT")){
-            instruction = instruction + "100";
-            
-        } else if(jum.equals("JNE")){
-            instruction = instruction + "101";
-            
-        } else if(jum.equals("JLE")){
-            instruction = instruction + "110";
-            
-        } else if(jum.equals("JMP")){
-            instruction = instruction + "111";
-            
+        switch (jum) {
+            case "JGT":
+                instruction = instruction + "001";
+                break;
+            case "JEQ":
+                instruction = instruction + "010";
+                break;
+            case "JGE":
+                instruction = instruction + "011";
+                break;
+            case "JLT":
+                instruction = instruction + "100";
+                break;
+            case "JNE":
+                instruction = instruction + "101";
+                break;
+            case "JLE":
+                instruction = instruction + "110";
+                break;
+            case "JMP":
+                instruction = instruction + "111";
+                break;
+            default:
+                break;
         }
     }
     
-    private Hashtable loading(){
+    private Hashtable loading(){ // adds all of the default names and locations
         destTable = new Hashtable<String, String>();
         destTable.put("SP", "0");
         destTable.put("LCL", "1");
@@ -359,14 +363,9 @@ public class Assembler {
 
     /**
      * @param args the command line arguments
+     * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
         Assembler assem = new Assembler(args[0]);
-            
-            /*else if(!(in.hasNext())) {
-                System.out.println("Deleted");
-            } else {
-                System.out.println(spaceless);
-            } */
         } 
     }
